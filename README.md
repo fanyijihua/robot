@@ -1,0 +1,1 @@
+# github-hook-demo-for-gold-miner
