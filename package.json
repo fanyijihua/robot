@@ -1,0 +1,17 @@
+{
+  "name": "github-hook-demo-for-gold-miner",
+  "version": "0.1.0",
+  "description": "",
+  "main": "hook.js",
+  "devDependencies": {},
+  "scripts": {
+    "start": "micro",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "sqrtthree <imsqrtthree@gmail.com>",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "github": "^9.2.0",
+    "micro": "^7.3.3"
+  }
+}
