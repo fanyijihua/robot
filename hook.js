@@ -202,7 +202,7 @@ module.exports = async (req, res) => {
   const eventName = req.headers['x-github-event']
   const payload = await json(req)
 
-  if (payload.sender.login === 'sqrthree') return
+  if (payload.sender.login === 'sqrthree') return send(res, 200)
 
   console.log(`Received GitHub event ${eventName} ${payload.action} from ${payload.sender.login}`)
 
