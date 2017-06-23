@@ -42,6 +42,18 @@ const addLabels = function addLabels(number, labels) {
   })
 }
 
+const includes = function (target, keywords) {
+  const words = Array.isArray(keywords) ? keywords : [ keywords ]
+
+  for (let i = 0; i < words.length; i += 1) {
+    if (target.includes(words[i])) {
+      return true
+    }
+  }
+
+  return false
+}
+
 const handleApplyForTranslation = async function (payload) {
   const { issue, comment, sender } = payload
   let awaitTranslation = false
@@ -55,7 +67,7 @@ const handleApplyForTranslation = async function (payload) {
 
   if (!awaitTranslation) return
 
-  if (comment.body.includes('认领')) {
+  if (includes(comment.body, ['认领翻译', '申请翻译'])) {
     try {
       await Promise.all([
         addComment(issue.number, `@${comment.user.login} 棒极啦 :tada:`),
@@ -90,7 +102,7 @@ const handleApplyForReview = async function (payload) {
 
   if (!awaitReview) return
 
-  if (comment.body.includes('认领')) {
+  if (includes(comment.body, ['认领校对', '申请校对'])) {
     let hasAtLeastOneReviewer = false
 
     for (let i = 0; i < issue.labels.length; i += 1) {
