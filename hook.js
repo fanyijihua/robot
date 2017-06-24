@@ -67,7 +67,7 @@ const handleApplyForTranslation = async function (payload) {
 
   if (!awaitTranslation) return
 
-  if (includes(comment.body, ['认领翻译', '申请翻译'])) {
+  if (includes(comment.body, ['认领翻译', '申请翻译', '翻译认领'])) {
     try {
       await Promise.all([
         addComment(issue.number, `@${comment.user.login} 棒极啦 :tada:`),
@@ -102,7 +102,7 @@ const handleApplyForReview = async function (payload) {
 
   if (!awaitReview) return
 
-  if (includes(comment.body, ['认领校对', '申请校对'])) {
+  if (includes(comment.body, ['认领校对', '申请校对', '校对认领'])) {
     let hasAtLeastOneReviewer = false
 
     for (let i = 0; i < issue.labels.length; i += 1) {
