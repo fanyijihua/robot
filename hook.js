@@ -212,7 +212,14 @@ const handleNewIssue = async (payload) => {
 
 module.exports = async (req, res) => {
   const eventName = req.headers['x-github-event']
-  const payload = await json(req)
+  let payload
+
+  try {
+    payload = await json(req)
+  } catch(err) {
+    console.error(err)
+    return send(res, 400)
+  }
 
   if (payload.sender.login === 'sqrthree') return send(res, 200)
 
