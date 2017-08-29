@@ -221,7 +221,7 @@ module.exports = async (req, res) => {
     return send(res, 400)
   }
 
-  if (payload.sender.login === 'sqrthree') return send(res, 200)
+  if (payload.sender.login === 'leviding') return send(res, 200)
 
   console.log(`Received GitHub event ${eventName} ${payload.action} from ${payload.sender.login}`)
 
