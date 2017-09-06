@@ -12,7 +12,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "github": "^10.1.0",
-    "micro": "^7.3.3",
+    "micro": "^8.0.4",
     "pino": "^4.7.1"
   }
 }
