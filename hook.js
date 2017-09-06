@@ -222,8 +222,6 @@ module.exports = async (req, res) => {
   const eventName = req.headers['x-github-event']
   let payload
 
-  if (req.url === '/') return send(res, 200, 'Hello, World.')
-
   try {
     payload = await json(req)
   } catch(err) {
