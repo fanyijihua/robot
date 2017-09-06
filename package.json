@@ -11,7 +11,7 @@
   "author": "sqrtthree <imsqrtthree@gmail.com>",
   "license": "GPL-3.0",
   "dependencies": {
-    "github": "^9.2.0",
+    "github": "^10.1.0",
     "micro": "^7.3.3",
     "pino": "^4.7.1"
   }
