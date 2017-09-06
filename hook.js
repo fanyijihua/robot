@@ -90,8 +90,6 @@ const handleApplyForTranslation = async function (payload) {
   } else {
     logger.debug(`Can not handle request of ${sender.login} from #${issue.number} with message ${comment.body}.`)
   }
-
-  logger.debug('Done.')
 }
 
 const handleApplyForReview = async function (payload) {
@@ -167,8 +165,6 @@ const handleApplyForReview = async function (payload) {
   } else {
     logger.debug(`Can not handle request of ${sender.login} from #${issue.number} with message ${comment.body}.`)
   }
-
-  logger.debug('Done.')
 }
 
 const handleNewPull = async function (payload) {
@@ -205,8 +201,6 @@ const handleNewPull = async function (payload) {
       }
     }
   }
-
-  logger.debug('Done.')
 }
 
 const handleNewIssue = async (payload) => {
@@ -222,14 +216,21 @@ module.exports = async (req, res) => {
   const eventName = req.headers['x-github-event']
   let payload
 
+  logger.info(`<-- ${req.method} ${req.url}`)
+
   try {
     payload = await json(req)
   } catch(err) {
     logger.error(`URL: ${req.url}, Message: ${err.message}`)
+    logger.info(`--> ${req.method} ${req.url} 400`)
     return send(res, 400)
   }
 
-  if (payload.sender.login === 'leviding') return send(res, 200)
+  if (payload.sender.login === 'leviding') {
+    logger.info(`--> payload.sender.login === leviding`)
+    logger.info(`--> ${req.method} ${req.url} 200`)
+    return send(res, 200)
+  }
 
   logger.debug(`Received GitHub event ${eventName} ${payload.action} from ${payload.sender.login}`)
 
@@ -249,7 +250,7 @@ module.exports = async (req, res) => {
     handleNewIssue(payload)
   }
 
-  logger.debug(`No response.`)
-
   send(res, 200)
+
+  logger.info(`--> ${req.method} ${req.url} 200`)
 }
