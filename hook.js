@@ -1,7 +1,9 @@
 const { json, send } = require('micro')
 const GitHubApi = require('github')
-
+const pino = require('pino')
 const config = require('./config')
+
+const logger = pino()
 
 const github = new GitHubApi({
   debug: config.debug,
@@ -75,15 +77,15 @@ const handleApplyForTranslation = async function (payload) {
         addLabels(issue.number, ['正在翻译'])
       ])
     } catch(err) {
-      return console.error(err)
+      return logger.error(err)
     }
 
-    console.log(`Handle request of ${sender.login} from #${issue.number} with message ${comment.body} successfully.`)
+    logger.log(`Handle request of ${sender.login} from #${issue.number} with message ${comment.body} successfully.`)
   } else {
-    console.log(`Can not handle request of ${sender.login} from #${issue.number} with message ${comment.body}.`)
+    logger.log(`Can not handle request of ${sender.login} from #${issue.number} with message ${comment.body}.`)
   }
 
-  console.log('Done.')
+  logger.log('Done.')
 }
 
 const handleApplyForReview = async function (payload) {
@@ -115,7 +117,7 @@ const handleApplyForReview = async function (payload) {
     }
 
     try {
-      console.log(`Trying to update PR #${issue.number} status.`)
+      logger.log(`Trying to update PR #${issue.number} status.`)
 
       if (hasAtLeastOneReviewer) {
         await Promise.all([
@@ -129,9 +131,9 @@ const handleApplyForReview = async function (payload) {
         ])
       }
 
-      console.log(`Update PR #${issue.number} status successfully.`)
+      logger.log(`Update PR #${issue.number} status successfully.`)
     } catch(err) {
-      return console.error(err)
+      return logger.error(err)
     }
 
     const matchedIssueNumber = /#\d+/.exec(issue.body)
@@ -141,7 +143,7 @@ const handleApplyForReview = async function (payload) {
 
       if (typeof issueNumber === 'number') {
         try {
-          console.log(`Trying to update reference issue #${issue.number} status.`)
+          logger.log(`Trying to update reference issue #${issue.number} status.`)
 
           if (hasAtLeastOneReviewer) {
             await removeLabel(issueNumber, '请到对应的 PR 下认领校对')
@@ -149,30 +151,30 @@ const handleApplyForReview = async function (payload) {
             await addLabels(issueNumber, ['正在校对'])
           }
 
-          console.log(`Update reference issue #${issue.number} status successfully.`)
+          logger.log(`Update reference issue #${issue.number} status successfully.`)
         } catch (err) {
-          console.error(err)
+          logger.error(err)
         }
       }
     }
-    console.log(`Handle request of ${sender.login} from #${issue.number} with message ${comment.body} successfully .`)
+    logger.log(`Handle request of ${sender.login} from #${issue.number} with message ${comment.body} successfully .`)
   } else {
-    console.log(`Can not handle request of ${sender.login} from #${issue.number} with message ${comment.body}.`)
+    logger.log(`Can not handle request of ${sender.login} from #${issue.number} with message ${comment.body}.`)
   }
 
-  console.log('Done.')
+  logger.log('Done.')
 }
 
 const handleNewPull = async function (payload) {
   const { pull_request: pull, sender } = payload
 
-  console.log(`Trying to add label "校对认领" to pull ${pull.number}.`)
+  logger.log(`Trying to add label "校对认领" to pull ${pull.number}.`)
 
   await Promise.all([
     addLabels(pull.number, ['校对认领'])
   ])
 
-  console.log(`Add label "校对认领" to pull ${pull.number} successfully.`)
+  logger.log(`Add label "校对认领" to pull ${pull.number} successfully.`)
 
   const matchedIssueNumber = /#\d+/.exec(pull.body)
 
@@ -180,10 +182,10 @@ const handleNewPull = async function (payload) {
     const issueNumber = Number(matchedIssueNumber[0].substring(1))
 
     if (typeof issueNumber === 'number') {
-      console.log(`Got the reference #${issueNumber} from pull #${pull.number}.`)
+      logger.log(`Got the reference #${issueNumber} from pull #${pull.number}.`)
 
       try {
-        console.log(`Trying to update issue #${issueNumber} status.`)
+        logger.log(`Trying to update issue #${issueNumber} status.`)
 
         await Promise.all([
           addComment(issueNumber, `PR 地址：#${pull.number}`),
@@ -191,14 +193,14 @@ const handleNewPull = async function (payload) {
           addLabels(issueNumber, ['请到对应的 PR 下认领校对'])
         ])
 
-        console.log(`Update issue #${issueNumber} status successfully.`)
+        logger.log(`Update issue #${issueNumber} status successfully.`)
       } catch(err) {
-        console.error(err)
+        logger.error(err)
       }
     }
   }
 
-  console.log('Done.')
+  logger.log('Done.')
 }
 
 const handleNewIssue = async (payload) => {
@@ -206,7 +208,7 @@ const handleNewIssue = async (payload) => {
 
   if (issue.title.includes('推荐优秀英文文章')) {
     await addComment(issue.number, `:heart: 感谢有你 ♪(*´▽｀*)ノ`)
-    console.log(`Reply issue #${issue.number} with title ${issue.title} successfully.`)
+    logger.log(`Reply issue #${issue.number} with title ${issue.title} successfully.`)
   }
 }
 
@@ -217,13 +219,13 @@ module.exports = async (req, res) => {
   try {
     payload = await json(req)
   } catch(err) {
-    console.error(err)
+    logger.error(err)
     return send(res, 400)
   }
 
   if (payload.sender.login === 'leviding') return send(res, 200)
 
-  console.log(`Received GitHub event ${eventName} ${payload.action} from ${payload.sender.login}`)
+  logger.log(`Received GitHub event ${eventName} ${payload.action} from ${payload.sender.login}`)
 
   if (eventName === 'issue_comment' && payload.action === 'created') {
     if (payload.issue.html_url.includes('pull')) {
@@ -241,7 +243,7 @@ module.exports = async (req, res) => {
     handleNewIssue(payload)
   }
 
-  console.log(`No response.`)
+  logger.log(`No response.`)
 
   send(res, 200)
 }
